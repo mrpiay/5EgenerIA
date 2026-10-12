@@ -153,12 +153,11 @@ def page_html(html, html_file, accent, first):
 
     lead, meta = "", ""
     if first:
-        # Propuesta: cabecera como las demás ("Propuesta" + "En breve") y De/Para debajo.
-        # El título largo y la frase principal solo se muestran en la portada.
+        # Presentación: título y resumen. De/Para, el título largo y la frase principal
+        # solo se muestran en la portada.
         subtitle = "Presentación"
         m = re.search(r"<p><strong>De:</strong>.*?</p>", head, re.S)
         if m:
-            meta = m.group(0).replace("<p>", '<p class="meta">', 1)
             head = head.replace(m.group(0), "", 1)
         head = re.sub(r"<p><strong>(?!De:).*?</strong></p>", "", head, count=1, flags=re.S)
     # El blockquote "En breve" va a la cabecera.
@@ -265,6 +264,7 @@ def landing_html(html):
     """Portada: solo el banner, centrado y a pantalla completa, con botones a las páginas."""
     title = re.search(r"<h1[^>]*>(.*?)</h1>", html, re.S).group(1).partition(" — ")[2]
     tagline = re.search(r"<p><strong>(?!De:)(.*?)</strong></p>", html, re.S).group(1)
+    de_para = re.search(r"<p>(<strong>De:</strong>.*?)</p>", html, re.S).group(1)
     buttons = f'<a href="{PAGES[0][0]}">Presentación</a>'
     # Un punto sobre cada letra de GENER: las cinco fases que la IA recorre en secuencia.
     gener = "".join(f'<span class="l" style="--i:{i}">{c}</span>' for i, c in enumerate("gener"))
@@ -283,6 +283,7 @@ def landing_html(html):
   <h1>{title}</h1>
   <p class="lead">{tagline}</p>
   <nav class="landing-nav">{buttons}</nav>
+  <p class="meta landing-meta">{de_para}</p>
 </main>
 <script>{SKY_JS}</script>
 </body>
