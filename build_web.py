@@ -43,7 +43,8 @@ def render(md_text):
 
 
 # Palabras clave de los algoritmos, en negrita como en los artículos (solo en el código, no en los comentarios ▷)
-ALG_KEYWORDS = r"para cada|para|hasta que|repetir|si|devolver|salir del bucle|detener|GenerarFase|ValorarFase|AjustarReglas"
+ALG_KEYWORDS = r"para cada|para|hasta que|repetir|si|devolver|salir del bucle|detener"
+ALG_FUNCTIONS = r"GenerarFase|ValorarFase|AjustarReglas|AprenderEvaluador"
 ALG_LABELS = r"Entrada:|Salida:|Recibe:|Devuelve:"
 
 
@@ -55,8 +56,9 @@ def bold_algorithm(code):
             continue
         line = re.sub(rf"^({ALG_LABELS})", r"<b>\1</b>", line)
         code_part, sep, comment = line.partition("▷")
-        if re.match(r"\s*\d+\s", code_part):  # solo las líneas numeradas
+        if re.match(r"\s*\d+\s", code_part):  # palabras clave: solo en las líneas numeradas
             code_part = re.sub(rf"(?<![\wÀ-ÿ])({ALG_KEYWORDS})(?![\wÀ-ÿ])", r"<b>\1</b>", code_part)
+        code_part = re.sub(rf"\b({ALG_FUNCTIONS})\b", r"<b>\1</b>", code_part)  # nombres de función: siempre
         lines.append(code_part + sep + comment)
     return "\n".join(lines)
 

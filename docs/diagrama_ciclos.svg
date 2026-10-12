@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1038 694" font-family="-apple-system, 'Segoe UI', Roboto, Arial, sans-serif" role="img" aria-labelledby="t d">
   <title id="t">Los dos ciclos de 5EgenerIA</title>
-  <desc id="d">Generador y evaluador secuenciales, fase a fase. Ciclo interno: las reglas del 5E y la base de conocimiento alimentan al planificador, que fija la fase; el generador IA la redacta y el verificador comprueba con reglas su estructura. La fase pasa al ciclo externo: el evaluador IA rellena la rúbrica de esa fase, que el generador no ve, y obtiene su valoración. Si la fase no alcanza el nivel máximo y quedan iteraciones, el ciclo externo ajusta las reglas (refuerzo) y la fase se genera de nuevo; el generador solo ve las reglas ajustadas. Cuando alcanza el máximo o se agotan las iteraciones, y siempre que supere el mínimo, se pasa a la fase siguiente. Tras la quinta fase, el resultado es la secuencia didáctica 5E con su fidelidad: cinco resultados, uno por fase. El evaluador aprende de rúbricas modelo y de las anotaciones de la supervisión humana, que se realiza cuando se puede, por fases y por secuencias completas (supervisado). Fuera del alcance, en línea punteada, el aula (fidelidad de implementación) como línea futura.</desc>
+  <desc id="d">Generador y evaluador secuenciales, fase a fase. Ciclo interno: las reglas del 5E y la base de conocimiento alimentan al planificador, que fija la fase; el generador IA la redacta y el verificador comprueba con reglas su estructura. La fase pasa al ciclo externo: el evaluador IA rellena la rúbrica de esa fase, que el generador no ve, y obtiene su valoración. Si la fase no alcanza el nivel máximo y quedan iteraciones, el ciclo externo ajusta las reglas (refuerzo) y la fase se genera de nuevo; el generador solo ve las reglas ajustadas. Cuando alcanza el máximo o se agotan las iteraciones, y siempre que supere el mínimo, se pasa a la fase siguiente. Tras la quinta fase, el resultado es la secuencia didáctica 5E con su fidelidad: cinco resultados, uno por fase. El evaluador aprende de rúbricas modelo y de las anotaciones de la supervisión humana, que se realiza cuando se puede, por fases y por secuencias completas (supervisado). La supervisión humana, cuando se puede, anota fases y secuencias completas con la rúbrica; sus anotaciones se suman a las rúbricas modelo, de las que aprende el evaluador, y una parte se reserva solo para medir. No interviene en el bucle de cada fase. Fuera del alcance, en línea punteada, el aula (fidelidad de implementación) como línea futura.</desc>
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4a78a8"/>
@@ -82,7 +82,7 @@
 
     <rect x="793" y="476" width="180" height="62" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
     <text x="883" y="502" text-anchor="middle" font-weight="700" fill="#1f2937">Rúbricas modelo</text>
-    <text x="883" y="521" text-anchor="middle" font-size="12" fill="#5b6472">+ supervisión humana</text>
+    <text x="883" y="521" text-anchor="middle" font-size="12" fill="#5b6472">+ anotaciones humanas</text>
   </g>
   <line x1="793" y1="405" x2="722" y2="405" stroke="#4a78a8" stroke-width="2" marker-end="url(#a)"/>
   <text x="757" y="397" text-anchor="middle" font-size="12" fill="#5b6472">rellena</text>
@@ -90,7 +90,14 @@
   <text x="469" y="397" text-anchor="middle" font-size="12" fill="#5b6472">da</text>
   <line x1="883" y1="476" x2="883" y2="440" stroke="#4a78a8" stroke-width="2" marker-end="url(#a)"/>
   <text x="873" y="462" text-anchor="end" font-size="12" fill="#5b6472">aprende (supervisado)</text>
-  
+
+  <!-- Supervisión humana: sus anotaciones se suman a las rúbricas modelo -->
+  <rect x="440" y="471" width="280" height="62" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="580" y="494" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">Supervisión humana</text>
+  <text x="580" y="512" text-anchor="middle" font-size="11" fill="#5b6472">cuando se puede: fases y secuencias completas</text>
+  <text x="580" y="527" text-anchor="middle" font-size="11" fill="#5b6472">una parte se reserva solo para medir</text>
+  <line x1="720" y1="507" x2="789" y2="507" stroke="#4a78a8" stroke-width="2" marker-end="url(#a)"/>
+  <text x="754" y="499" text-anchor="middle" font-size="12" fill="#5b6472">anota</text>
 
   <!-- Vuelta al generador: fase siguiente o reglas ajustadas -->
   <path d="M220,386 L50,386 L50,164 L86,164" fill="none" stroke="#4a78a8" stroke-width="2" marker-end="url(#a)"/>
@@ -105,11 +112,14 @@
   <rect x="220" y="622" width="206" height="62" rx="4" fill="#4a78a8"/>
   <text x="323" y="648" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Secuencia didáctica 5E</text>
   <text x="323" y="667" text-anchor="middle" font-size="13" fill="#fff">fidelidad: 5 resultados</text>
+  <!-- La supervisión humana también revisa secuencias completas -->
+  <path d="M426,653 L580,653 L580,537" fill="none" stroke="#4a78a8" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a)"/>
+  <text x="590" y="628" font-size="12" fill="#5b6472">secuencias completas</text>
   <!-- Fuera del alcance: el aula, línea futura -->
-  <rect x="40" y="630" width="150" height="46" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
-  <text x="115" y="649" text-anchor="middle" font-size="13" font-weight="700" fill="#5b6472">Aula · línea futura</text>
-  <text x="115" y="666" text-anchor="middle" font-size="11" fill="#5b6472">implementación</text>
-  <line x1="220" y1="653" x2="194" y2="653" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#g)"/>
+  <rect x="20" y="630" width="140" height="46" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="90" y="649" text-anchor="middle" font-size="13" font-weight="700" fill="#5b6472">Aula · línea futura</text>
+  <text x="90" y="666" text-anchor="middle" font-size="11" fill="#5b6472">implementación</text>
+  <line x1="220" y1="653" x2="164" y2="653" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#g)"/>
 
   <!-- Paso de la fase al ciclo externo -->
   <path d="M752,163 L883,163 L883,370" fill="none" stroke="#4a78a8" stroke-width="2" marker-end="url(#a)"/>

@@ -38,28 +38,30 @@ Algoritmo 1. Generación y evaluación de una secuencia, fase a fase
 
 Entrada:  ficha de diseño D (tema, nivel y objetivos, que aporta el docente),
           reglas R, rúbrica por fases B, niveles mínimo y máximo de cada fase,
-          límite de iteraciones K
+          límite de iteraciones K, rúbricas modelo y anotaciones humanas A
 Salida:   secuencia S y su fidelidad F = (f₁, …, f₅), un resultado por fase
 
- 1  S ← ∅
- 2  para cada fase i ∈ (Engage, Explore, Explain, Elaborate, Evaluate):
- 3      mejor ← ninguna
- 4      para k = 1, …, K:
- 5          fase ← GenerarFase(i, S, D, R)          ▷ función 1: ciclo interno
- 6          v ← ValorarFase(fase, S, Bᵢ)            ▷ función 2: ciclo externo
- 7          si v mejora a mejor: mejor ← (fase, v)
- 8          si v alcanza el máximo: salir del bucle
- 9          R ← AjustarReglas(R, v)                 ▷ función 3: refuerzo, desde E5
-10      si la valoración de mejor no alcanza el mínimo:
-11          detener y registrar el caso
-12      S ← S + fase de mejor;  fᵢ ← valoración de mejor
-13  devolver S, F
+ 1  si hay anotaciones nuevas: AprenderEvaluador(A)     ▷ función 4: supervisado
+ 2  S ← ∅
+ 3  para cada fase i ∈ (Engage, Explore, Explain, Elaborate, Evaluate):
+ 4      mejor ← ninguna
+ 5      para k = 1, …, K:
+ 6          fase ← GenerarFase(i, S, D, R)              ▷ función 1: ciclo interno
+ 7          v ← ValorarFase(fase, S, Bᵢ)                ▷ función 2: ciclo externo
+ 8          si v mejora a mejor: mejor ← (fase, v)
+ 9          si v alcanza el máximo: salir del bucle
+10          R ← AjustarReglas(R, v)                     ▷ función 3: refuerzo, desde E5
+11      si la valoración de mejor no alcanza el mínimo:
+12          detener y registrar el caso
+13      S ← S + fase de mejor;  fᵢ ← valoración de mejor
+14  devolver S, F
 
-Cuando hay datos: el evaluador IA aprende (supervisado) de rúbricas modelo y de
-las anotaciones de la supervisión humana, y se mide con datos reservados.
+El evaluador aprende antes de empezar cada secuencia, no a mitad: sus cinco
+valoraciones son así comparables entre sí. R se conserva entre secuencias:
+los ajustes que mejoran perduran.
 ```
 
-Las funciones se apoyan en cinco **primitivas**, que se describen por lo que reciben y devuelven; su implementación se define en el estudio indicado:
+Las funciones se apoyan en seis **primitivas**, que se describen por lo que reciben y devuelven; su implementación se define en el estudio indicado:
 
 | Primitiva | Recibe → devuelve | Cómo funciona | Se define en |
 |---|---|---|---|
@@ -67,6 +69,7 @@ Las funciones se apoyan en cinco **primitivas**, que se describen por lo que rec
 | `GeneradorIA` | plan y fases previas → borrador de la fase | Modelo de lenguaje con instrucciones | E4 |
 | `Verificador` | borrador y reglas → fallos estructurales | Reglas | E4 |
 | `EvaluadorIA` | fase y criterio → nivel, tipo de error y evidencia | Modelo de lenguaje con instrucciones y ejemplos | E3 |
+| `Ajustar` | evaluador y anotaciones → evaluador ajustado | Instrucciones y ejemplos; entrenar, solo si hay datos | E3 |
 | `ProponerCambio` | reglas y valoración → reglas candidatas | A investigar | E5 |
 
 **Generación secuencial: ciclo interno, genera cada fase.** Es un sistema híbrido que combina reglas del modelo 5E, una base de conocimiento y un generador IA. El planificador fija qué debe hacer la fase con las reglas y la base de conocimiento; el generador IA la redacta partiendo de las fases anteriores, y el verificador comprueba con las mismas reglas su estructura: si algo falla, indica qué regla se incumple y dónde, y el generador IA corrige esa parte. Las reglas cubren lo estructural y lo explícito; la fidelidad pedagógica de la fase la juzga el evaluador.
@@ -97,11 +100,11 @@ Devuelve: la valoración v de la fase
 
  1  para cada criterio c de Bᵢ, incluido el enlace con la fase anterior:
  2      v_c ← EvaluadorIA(fase, S, c)               ▷ nivel, tipo de error y evidencia
- 3      si no puede decidir: marcar c               ▷ para supervisión humana
+ 3      si no puede decidir: marcar c               ▷ se anota después (supervisión humana)
  4  devolver v = (v_c) para todos los criterios
 ```
 
-**La circularidad se evita por diseño:** el generador nunca ve la rúbrica ni recibe la valoración; solo ve las reglas ajustadas. El evaluador, a su vez, aprende a rellenar la rúbrica con **rúbricas modelo**, de valoración conocida, y con las anotaciones de la supervisión humana, que se realiza cuando se puede, por fases y por secuencias completas (supervisado), nunca de sus propios resultados. Los ajustes de las reglas son automáticos: un cambio se mantiene si mejora la valoración de la fase (refuerzo). Como ese ajuste optimiza las reglas según el evaluador IA, la fidelidad final se contrasta con una **comprobación independiente que no interviene en el ajuste**: rúbricas modelo y supervisión humana sobre secuencias reservadas. Así, **la verificación interna ayuda a corregir las secuencias, y la comprobación independiente permite evaluar su calidad**.
+**La circularidad se evita por diseño:** el generador nunca ve la rúbrica ni recibe la valoración; solo ve las reglas ajustadas. El evaluador, a su vez, aprende a rellenar la rúbrica con **rúbricas modelo**, de valoración conocida, y con las anotaciones de la supervisión humana, que se realiza cuando se puede, por fases y por secuencias completas (supervisado), nunca de sus propios resultados. La supervisión humana no interviene en el bucle de cada fase: anota, y sus anotaciones se suman a las rúbricas modelo. Los ajustes de las reglas son automáticos: un cambio se mantiene si mejora la valoración de la fase (refuerzo). Como ese ajuste optimiza las reglas según el evaluador IA, la fidelidad final se contrasta con una **comprobación independiente que no interviene en el ajuste**: la parte reservada de las rúbricas modelo y de las anotaciones humanas, que nunca se usa para aprender ni ajustar. Así, **la verificación interna ayuda a corregir las secuencias, y la comprobación independiente permite evaluar su calidad**.
 
 ```algoritmo
 Función 3. AjustarReglas(R, v): refuerzo
@@ -116,6 +119,20 @@ Devuelve: las reglas para la siguiente iteración
 El generador solo recibe R: nunca ve la rúbrica ni las valoraciones.
 El evaluador nunca aprende de sus propias valoraciones.
 La fidelidad final se comprueba con datos reservados, ajenos al ajuste.
+```
+
+```algoritmo
+Función 4. AprenderEvaluador(A): aprendizaje supervisado
+
+Recibe:   rúbricas modelo y anotaciones de la supervisión humana A
+Devuelve: el evaluador IA ajustado y su acuerdo medido
+
+ 1  separar A en A_desarrollo y A_prueba            ▷ por fuente; A_prueba se reserva
+ 2  EvaluadorIA ← Ajustar(EvaluadorIA, A_desarrollo)
+ 3  medir el acuerdo con A_prueba                   ▷ nunca se usa para aprender ni ajustar
+
+Se llama al empezar cada secuencia, si hay anotaciones nuevas (línea 1 del algoritmo 1).
+Ajustar usa instrucciones y ejemplos; entrenar un modelo, solo si hay datos.
 ```
 
 *Qué significa que una valoración mejore a otra o alcance el mínimo y el máximo, el límite de iteraciones y cómo se propone un cambio de regla los fija el protocolo de cada estudio.*
@@ -196,7 +213,7 @@ La pregunta central, la de E3, se completa con cuatro preguntas, cada una ligada
 |---|---|
 | **Referencia** | Rúbricas modelo: secuencias de referencia con su rúbrica ya rellenada, de calidad contrastada o con errores F1–F5 introducidos a propósito. Se completan con las anotaciones de la supervisión humana, cuando se puede. |
 | **Rúbrica** | Por fases, con niveles 0–1–2 de partida, mínimo y máximo por fase y un manual que distingue la falta de evidencia del incumplimiento. Un piloto con un segundo anotador la ajusta; si cambia mucho, se vuelve a comprobar. |
-| **Validez** | Tres evidencias que no se sustituyen: validez de contenido, acuerdo entre anotadores y acuerdo del evaluador IA con la referencia en datos no usados para ajustarlo. |
+| **Validez** | Tres evidencias que no se sustituyen: validez de contenido, acuerdo entre anotadores y acuerdo del evaluador IA con la referencia en datos no usados para ajustarlo. Al anotar secuencias completas se añade un juicio global por secuencia, como contraste de la rúbrica. |
 | **Análisis** | Coeficiente adecuado a la escala ordinal y detección por criterio y por tipo de error (sensibilidad y especificidad); con pocos casos, el resultado es exploratorio. Umbrales, criterios esenciales y condición de paso a E4 se fijan antes de ver resultados, justificados con el piloto. |
 | **Datos** | Desarrollo, validación y prueba final, separados por fuente o familia de secuencias, y por tarea en E4 y E5; la prueba final no se consulta para ajustar nada. |
 | **Corpus** | Secuencias 5E de astronomía con procedencia documentada, incluidos planes generados con IA de uso general; formato común y análisis por procedencia. Si no basta en español, otros idiomas, sin salir de la astronomía. |
@@ -206,11 +223,11 @@ La pregunta central, la de E3, se completa con cuatro preguntas, cada una ligada
 
 | Riesgo | Cómo se aborda |
 |---|---|
-| **Que la IA se apruebe a sí misma** | El generador no ve la rúbrica ni las valoraciones; el evaluador IA aprende de rúbricas modelo y anotaciones humanas, nunca de sí mismo. Como el refuerzo optimiza las reglas según el evaluador, la fidelidad final se contrasta con rúbricas modelo y supervisión humana sobre secuencias reservadas, que no intervienen en el ajuste. |
+| **Que la IA se apruebe a sí misma** | El generador no ve la rúbrica ni las valoraciones; el evaluador IA aprende de rúbricas modelo y anotaciones humanas, nunca de sí mismo. Como el refuerzo optimiza las reglas según el evaluador, la fidelidad final se contrasta con la parte reservada de las rúbricas modelo y de las anotaciones humanas, que nunca se usa para aprender ni ajustar. |
 | **Corpus escaso o sesgado** | Errores F1–F5 introducidos de forma controlada, corpus diverso y, si hace falta, otros idiomas. |
 | **Rúbrica que no mide bien** | Validez de contenido, piloto y juicio global como contraste. |
 | **Doble rol del autor** | Procedencia anonimizada, rúbricas modelo con respuesta conocida y criterios explícitos, como en el TFM. |
-| **Dependencia de terceros** | Reducida a propósito: la supervisión humana es un contraste y se hace cuando se puede. |
+| **Dependencia de terceros** | Reducida a propósito: la supervisión humana mejora al evaluador y aporta la comprobación independiente, pero no interviene en el bucle de cada fase y se hace cuando se puede. |
 | **Ética y datos** | Los primeros estudios no usan datos de alumnado; se respetan los derechos de uso del corpus; comité de ética antes de cualquier trabajo en aula. |
 
 ## Qué aporta
