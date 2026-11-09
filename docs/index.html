@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5EgenerIA · Propuesta de colaboración post-TFM</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body class="landing">
+<canvas id="sky" class="sky" aria-hidden="true"></canvas>
+<main class="landing-banner">
+  <div class="logo-big" aria-label="5EgenerIA">5E<span class="gener"><span class="l" style="--i:0">g</span><span class="l" style="--i:1">e</span><span class="l" style="--i:2">n</span><span class="l" style="--i:3">e</span><span class="l" style="--i:4">r</span></span><span class="ia">IA</span></div>
+  <h1>Propuesta de colaboración post-TFM</h1>
+  <p class="lead">Aplicación de inteligencia artificial para generar<br>
+secuencias didácticas de astronomía y astrofísica<br>
+fieles al modelo 5E</p>
+  <nav class="landing-nav"><a href="presentacion.html">Presentación</a></nav>
+  <p class="meta landing-meta"><strong>De:</strong> Javier Piay Pombo<br>
+<strong>Para:</strong> mi director de TFM</p>
+</main>
+<script>
+(() => {
+  // Campo de estrellas que avanza hacia el espectador, muy despacio.
+  // Lejos: puntos grises y pequeños; al acercarse crecen y se iluminan en blanco.
+  const c = document.getElementById("sky"), ctx = c.getContext("2d");
+  const N = 260, SPEED = 0.0005, still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w, h, f, dpr, stars = [];
+  const star = (z) => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: z ?? Math.random() });
+  const resize = () => {
+    dpr = window.devicePixelRatio || 1;
+    w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr;
+    f = Math.max(w, h) * 0.5;
+  };
+  const draw = () => {
+    ctx.clearRect(0, 0, w, h);
+    for (const s of stars) {
+      if (!still) s.z -= SPEED;
+      const x = w / 2 + (s.x / s.z) * f, y = h / 2 + (s.y / s.z) * f;
+      if (s.z <= 0.02 || x < 0 || x > w || y < 0 || y > h) { Object.assign(s, star(1)); continue; }
+      const k = 1 - s.z;                      // 0 lejos, 1 cerca
+      const g = Math.round(150 + 105 * k);    // gris -> blanco
+      ctx.fillStyle = `rgba(${g},${g + 5 > 255 ? 255 : g + 5},${g + 15 > 255 ? 255 : g + 15},${0.25 + 0.75 * k})`;
+      ctx.beginPath();
+      ctx.arc(x, y, (0.4 + 2.2 * k * k) * dpr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (!still) requestAnimationFrame(draw);
+  };
+  resize(); addEventListener("resize", resize);
+  stars = Array.from({ length: N }, () => star());
+  draw();
+})();
+</script>
+</body>
+</html>
